@@ -7,8 +7,11 @@ package com.fer.eliminarrepetidos;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import org.apache.camel.CamelContext;
+import org.apache.camel.component.jdbc.JdbcComponent;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
  *
@@ -18,9 +21,19 @@ public class Principal {
 
     public static void main(String[] args) {
         try {
+            BasicDataSource dataSource = new BasicDataSource();
+            dataSource.setUrl("jdbc:postgresql://localhost:5432/pruebacamel");
+            dataSource.setDriverClassName("org.postgresql.Driver");
+            dataSource.setPassword("auditoria");
+            dataSource.setUsername("auditoria");
+            dataSource.setInitialSize(4);
+            dataSource.setMaxIdle(4);
+            dataSource.setMaxTotal(16);
+
             CamelContext context = new DefaultCamelContext();
             RepetidosBean repetidosBean = new RepetidosBean();
             context.getRegistry().bind("rb", repetidosBean);
+            context.getRegistry().bind("dsPrueba", dataSource);
             RutaPrueba rutaPrueba = new RutaPrueba();
             context.addRoutes(rutaPrueba);
             context.start();

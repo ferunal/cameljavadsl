@@ -13,12 +13,16 @@ import org.apache.camel.model.language.SimpleExpression;
  *
  * @author netrunner
  */
-public class RutaPrueba extends RouteBuilder{
+public class RutaPrueba extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        Expression expression = new SimpleExpression("hole");
-        from("timer:hola?repeatCount=1").setBody(expression).bean("rb", "setSql(${body})").log("${body}").to("mock:salida");
+
+        Expression expression = new SimpleExpression("select * from lista l2");
+        from("timer:hola?repeatCount=1").setBody(expression).
+                bean("rb", "setSql(${body})").
+                log("${body}").bean("rb","getSql").
+                to("jdbc:dsPrueba").split().body().log("${body['nombre']}");
     }
-    
+
 }

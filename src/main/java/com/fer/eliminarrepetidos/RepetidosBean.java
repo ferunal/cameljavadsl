@@ -18,6 +18,6 @@ public class RepetidosBean {
 
     public void setSql(String sql) {
         this.sql = sql;
-        System.out.println("Metodo bean");
+        System.out.println(sql);
     }
 }
