@@ -58,7 +58,7 @@ public class Principal {
             context.getRegistry().bind("amqcf", amqcf);
             context.getRegistry().bind("pcf", pcf);
             context.getRegistry().bind("jmsTemplate", jmsTemplate);
-            context.getRegistry().bind("jaxrssfb", jaxrssfb);
+//            context.getRegistry().bind("jaxrssfb", jaxrssfb);
             //Instanciar rutas
             RutaPrueba rutaPrueba = new RutaPrueba();
             context.addRoutes(rutaPrueba);

@@ -29,7 +29,7 @@ public class RutaPrueba extends RouteBuilder {
 
         from("activemq:cola:informes").log("Datos de la cola: ${body['inf_nombre']}").to("mock:salidafin");
 
-        from("cxfrs://bean://jaxrssfb").log("${body}").to("mock:rs");
+//        from("cxfrs://bean://jaxrssfb").log("${body}").to("mock:rs");
     }
 
 }
