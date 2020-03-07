@@ -27,18 +27,18 @@ public class Principal {
     public static void main(String[] args) {
         try {
             BasicDataSource dataSource = new BasicDataSource();
-            dataSource.setUrl("jdbc:postgresql://192.168.0.34:5432/portal_reportes");
+            dataSource.setUrl("jdbc:postgresql://192.168.1.4:5432/polinotificadorfinal");
             dataSource.setDriverClassName("org.postgresql.Driver");
-            dataSource.setUsername("simple");
-            dataSource.setPassword("Seguro23*");
+            dataSource.setUsername("auditoria");
+            dataSource.setPassword("auditoria");
 
             dataSource.setInitialSize(4);
             dataSource.setMaxIdle(4);
             dataSource.setMaxTotal(16);
 
-            JAXRSServerFactoryBean jaxrssfb = new JAXRSServerFactoryBean();
-            jaxrssfb.setServiceClass(PlanillaRecursoBean.class);
-            jaxrssfb.setAddress("http://localhost:9080/");
+//            JAXRSServerFactoryBean jaxrssfb = new JAXRSServerFactoryBean();
+//            jaxrssfb.setServiceClass(PlanillaRecursoBean.class);
+//            jaxrssfb.setAddress("http://localhost:9080/");
              
             
             ActiveMQConnectionFactory amqcf = new ActiveMQConnectionFactory();
@@ -54,17 +54,17 @@ public class Principal {
             RepetidosBean repetidosBean = new RepetidosBean();
             //Registrar beans
             context.getRegistry().bind("rb", RepetidosBean.class, repetidosBean);
-            context.getRegistry().bind("dsPrueba", dataSource);
+            context.getRegistry().bind("dsPolinotificador", dataSource);
             context.getRegistry().bind("amqcf", amqcf);
             context.getRegistry().bind("pcf", pcf);
             context.getRegistry().bind("jmsTemplate", jmsTemplate);
 //            context.getRegistry().bind("jaxrssfb", jaxrssfb);
             //Instanciar rutas
-            RutaPrueba rutaPrueba = new RutaPrueba();
+            RutaEliminarRepetidos rutaPrueba = new RutaEliminarRepetidos();
             context.addRoutes(rutaPrueba);
             context.start();
             System.out.println("Running for 10 seconds and then stopping");
-            Thread.sleep(10000);
+            Thread.sleep(1000*60*60);
             context.stop();
         } catch (Exception ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
