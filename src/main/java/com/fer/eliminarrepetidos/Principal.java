@@ -5,17 +5,13 @@
  */
 package com.fer.eliminarrepetidos;
 
-import com.fer.eliminarrepetidos.beans.PlanillaRecursoBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.CamelContext;
-import org.apache.camel.component.jdbc.JdbcComponent;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.springframework.jms.core.JmsTemplate;
 
 /**
@@ -64,7 +60,7 @@ public class Principal {
             context.addRoutes(rutaPrueba);
             context.start();
             System.out.println("Running for 10 seconds and then stopping");
-            Thread.sleep(1000*60*60);
+            Thread.sleep(1000*60*60*12);
             context.stop();
         } catch (Exception ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
