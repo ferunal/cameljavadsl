@@ -22,6 +22,7 @@ public class Principal {
 
     public static void main(String[] args) {
         try {
+            
             BasicDataSource dataSource = new BasicDataSource();
             dataSource.setUrl("jdbc:postgresql://192.168.1.4:5432/polinotificadorfinal");
             dataSource.setDriverClassName("org.postgresql.Driver");
@@ -47,6 +48,8 @@ public class Principal {
             JmsTemplate jmsTemplate = new JmsTemplate(pcf);
 
             CamelContext context = new DefaultCamelContext();
+            context.setStreamCaching(Boolean.TRUE);
+            
             RepetidosBean repetidosBean = new RepetidosBean();
             //Registrar beans
             context.getRegistry().bind("rb", RepetidosBean.class, repetidosBean);
@@ -59,7 +62,7 @@ public class Principal {
             RutaEliminarRepetidos rutaPrueba = new RutaEliminarRepetidos();
             context.addRoutes(rutaPrueba);
             context.start();
-            System.out.println("Running for 10 seconds and then stopping");
+            System.out.println("Esperar 12 horas y parar contexto");
             Thread.sleep(1000*60*60*12);
             context.stop();
         } catch (Exception ex) {

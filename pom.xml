@@ -74,10 +74,68 @@
             <artifactId>activemq-pool</artifactId>
             <version>5.15.11</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-cxf</artifactId>
             <version>3.0.1</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>                
+                <configuration>                    
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>         
+                            <mainClass>com.fer.eliminarrepetidos.Principal</mainClass>
+                            <classpathPrefix>lib/</classpathPrefix>                   
+                        </manifest>
+                    </archive>                    
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generar-class-path</id>
+                        <phase>package</phase>
+                        <goals>
+                          
+                        </goals>                        
+                    </execution>
+                </executions>                
+            </plugin> 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>              
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeGroupIds>org.mockito,org.hamcrest,org.wildfly</excludeGroupIds>
+                           
+                        </configuration>
+                    </execution>               
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            
+                        </goals>
+                      
+                    </execution>                                                      
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+   
 </project>

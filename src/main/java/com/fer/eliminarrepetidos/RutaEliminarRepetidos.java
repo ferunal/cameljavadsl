@@ -5,6 +5,7 @@
  */
 package com.fer.eliminarrepetidos;
 
+import java.io.File;
 import org.apache.camel.Expression;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.language.SimpleExpression;
@@ -18,16 +19,17 @@ public class RutaEliminarRepetidos extends RouteBuilder {
     @Override
     public void configure() throws Exception {
 
+        String archivoLog = "c:" + File.separator + "progs" + File.separator + "logeliminarrepetidos.txt";
 //        String strSql = " select distinct np.pbj_archivofuente from nt_probacionobjeto np \n"
 //                + "where np.pbj_archivofuente  is not null and crg_id = 10";
         String strSql = "select  nc.crg_nombre pbj_archivofuente from nt_cargabase nc where nc.crg_estadocarga = 'cargado'\n"
-                + "and crg_eliminarrepetidos = false and crg_id = 1693";
+                + "and crg_eliminarrepetidos = false";
 
-        StringBuilder strBSqlHPVD = new StringBuilder(" select hash_personavacunadosis from nt_agendaactividades_simple inner join \n");
-        strBSqlHPVD.append("nt_probacionobjeto po on nt_agendaactividades_simple.hash_unificado = po.hash_unificado\n");
-        strBSqlHPVD.append("where po.pbj_archivofuente = '${body['pbj_archivofuente']}'\n");
-        strBSqlHPVD.append("group by hash_personavacunadosis\n");
-        strBSqlHPVD.append("having count(hash_personavacunadosis)>1 ");
+        String strBSqlHPVD = " select aas.hash_personavacunadosis from nt_agendaactividades_simple aas inner join \n"
+                + "nt_eventos evt on aas.hash_personavacunadosis = evt.hash_personavacunadosis\n"
+                + "and evt.evt_archivofuente = '${body['pbj_archivofuente']}'\n"
+                + "group by aas.hash_personavacunadosis\n"
+                + "having count(aas.hash_personavacunadosis)>1 ";
 
         String strCantidadPorHPVD = "select count(*) cantidad from nt_agendaactividades_simple nas where hash_personavacunadosis = '${body['hash_personavacunadosis']}'";
         String strCantidadPorHPVDFechaAtt = "select count(*) cantidad from nt_agendaactividades_simple nas "
@@ -46,7 +48,7 @@ public class RutaEliminarRepetidos extends RouteBuilder {
                 + "where nas.aacts_id > ${header[minidsf]} and nas.hash_personavacunadosis = '${header[hpvd]}'";
 
         Expression expressionArchivos = new SimpleExpression(strSql);
-        Expression expressionHashPVD = new SimpleExpression(strBSqlHPVD.toString());
+        Expression expressionHashPVD = new SimpleExpression(strBSqlHPVD);
         Expression expressionCantidadPorHPVD = new SimpleExpression(strCantidadPorHPVD);
         Expression expressionConsultaSiFechaAtt = new SimpleExpression(strCantidadPorHPVDFechaAtt);
         Expression expressionObtenerIdMinConFechaAtt = new SimpleExpression(strObtenerIdMinConFechaAtt);
@@ -59,7 +61,7 @@ public class RutaEliminarRepetidos extends RouteBuilder {
                 //                log("${body}").bean("rb", "getSql").
                 to("jdbc:dsPolinotificador").split().
                 body().
-               // log("${body['pbj_archivofuente']}").
+                // log("${body['pbj_archivofuente']}").
                 setBody(expressionHashPVD).
                 //  log("${body}").
                 //to("mock:archivos");
@@ -78,8 +80,8 @@ public class RutaEliminarRepetidos extends RouteBuilder {
                 when(header("cantidadEnconrada").isEqualTo(1L)).
                 to("direct:fin").endChoice();
 
-        from("direct:fechaatt").
-                log("Se elimina ${header[hpvd]} cantidad ${header[cantidadEnconrada]}").
+        from("direct:fechaatt").wireTap("direct:log").
+                //log("Se elimina ${header[hpvd]} con fecha atencion cantidad ${header[cantidadEnconrada]}").
                 setBody(expressionConsultaSiFechaAtt).
                 to("jdbc:dsPolinotificador").split().
                 body().setHeader("cantidadFechaAtt", new SimpleExpression("${body[cantidad]}")).
@@ -89,7 +91,9 @@ public class RutaEliminarRepetidos extends RouteBuilder {
                 when(header("cantidadFechaAtt").isEqualTo(0L)).
                 to("direct:eliminarsinfechatt").
                 endChoice();
-
+        from("direct:log").setBody(new SimpleExpression("${header[hpvd]}-${header[cantidadEnconrada]}"))
+                .to("activemq:cola:log");
+        from("activemq:cola:log").to("file://" + archivoLog);
         from("direct:eliminarconfechatt").setBody(expressionObtenerIdMinConFechaAtt).
                 to("jdbc:dsPolinotificador").
                 split().body().
