@@ -62,8 +62,8 @@ public class Principal {
             RutaEliminarRepetidos rutaPrueba = new RutaEliminarRepetidos();
             context.addRoutes(rutaPrueba);
             context.start();
-            System.out.println("Esperar 12 horas y parar contexto");
-            Thread.sleep(1000*60*60*12);
+            System.out.println("Esperar días parar contexto");
+            Thread.sleep(1000*60*60*12*8);
             context.stop();
         } catch (Exception ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
