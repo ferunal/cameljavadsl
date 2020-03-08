@@ -27,7 +27,7 @@ public class RutaEliminarRepetidos extends RouteBuilder {
 
         String strBSqlHPVD = " select aas.hash_personavacunadosis from nt_agendaactividades_simple aas inner join \n"
                 + "nt_eventos evt on aas.hash_personavacunadosis = evt.hash_personavacunadosis\n"
-                + "and evt.evt_archivofuente = '${body}'\n"
+                + "and evt.evt_archivofuente = '${body[pbj_archivofuente]}'\n"
                 + "group by aas.hash_personavacunadosis\n"
                 + "having count(aas.hash_personavacunadosis)>1 ";
 
@@ -56,21 +56,21 @@ public class RutaEliminarRepetidos extends RouteBuilder {
         Expression expressionObtenerIdMinSinFechaAtt = new SimpleExpression(strObtenerIdMinSinFechaAtt);
         Expression expressionEliminarIdMinSinFechaAtt = new SimpleExpression(strEliminarMinSinFechaAnt);
 
-//        from("timer:hola?repeatCount=1").setBody(expressionArchivos).
-//                //                bean("rb", "setSql(${body})").
-//                //                log("${body}").bean("rb", "getSql").
-//                to("jdbc:dsPolinotificador").split().
-//                body().
-//                // log("${body['pbj_archivofuente']}").
-//                setBody(expressionHashPVD).
-//                //  log("${body}").
-//                //to("mock:archivos");
-//                to("activemq:cola:consultarep");
-
-        from("activemq:cola:archivoproc").
-                log("Archivo elimar repetidos: ${body}").
+        from("timer:hola?repeatCount=1").setBody(expressionArchivos).
+                //                bean("rb", "setSql(${body})").
+                //                log("${body}").bean("rb", "getSql").
+                to("jdbc:dsPolinotificador").split().
+                body().
+                // log("${body['pbj_archivofuente']}").
                 setBody(expressionHashPVD).
-                  to("activemq:cola:consultarep");       
+                //  log("${body}").
+                //to("mock:archivos");
+                to("activemq:cola:consultarep");
+
+//        from("activemq:cola:archivoproc").
+//                log("Archivo elimar repetidos: ${body}").
+//                setBody(expressionHashPVD).
+//                  to("activemq:cola:consultarep");       
 
         from("activemq:cola:consultarep").
                 // log("Datos de la cola: ${body}").
