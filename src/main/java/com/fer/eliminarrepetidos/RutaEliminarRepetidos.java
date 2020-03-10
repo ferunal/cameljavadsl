@@ -27,7 +27,7 @@ public class RutaEliminarRepetidos extends RouteBuilder {
 
         String strBSqlHPVD = " select aas.hash_personavacunadosis from nt_agendaactividades_simple aas inner join \n"
                 + "nt_eventos evt on aas.hash_personavacunadosis = evt.hash_personavacunadosis\n"
-                + "and evt.evt_archivofuente = '${body[pbj_archivofuente]}'\n"
+                + "and evt.evt_archivofuente = '${body}'\n"
                 + "group by aas.hash_personavacunadosis\n"
                 + "having count(aas.hash_personavacunadosis)>1 ";
 
